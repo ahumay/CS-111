@@ -1,0 +1,40 @@
+NAME: Anthony Humay
+EMAIL: ahumay@ucla.edu
+ID: 304731856
+
+Beaglebone
+Serial Number : BBGW17051894
+MAC HWaddress: 2CF7F10666F4
+MAC inet addr:172.20.10.13
+
+The files included are:
+my_beaglebone.jpg
+---
+Shows me with my BeagleBone. 
+
+connected.png
+---
+Shows the ifconfig command with my student ID
+as the hostname. 
+
+copy.png 
+---
+Shows me copying example.c (Hello World program) from 
+my computer's Desktop to the BeagleBone's home directory ~. 
+
+build_run.png
+---
+Shows me, now SSHed into the BeagleBone, compiling example.c
+with gcc and running it. 
+It displays "Hello World" to the terminal. 
+
+git.png
+---
+Shows the correct output after cloning a repository from my own 
+Github. 
+
+Makefile
+---
+This Makefile very simple: just tar together all the images. 
+I made the default also tar the images. 
+Clean just removes everything else. 

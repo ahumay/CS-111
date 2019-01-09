@@ -1,0 +1,37 @@
+NAME: Anthony Humay
+EMAIL: ahumay@ucla.edu
+ID: 304731856
+
+The files included are:
+lab1a.c
+---
+To use non-canonical input mode with no echo, I used this reference at my TA's advice:
+https://www.gnu.org/software/libc/manual/html_node/Noncanon-Example.html
+
+POLL
+1. we have one pollfd for stdin, one for stdout
+2. pollin
+pollup/pollerr
+3. loop with poll(2)/timeout read only if input
+4. in case of shutdown process an input before shutdown
+To get familiar with poll, I looked at:
+https://linux.die.net/man/2/poll
+
+To understand how to pass input/output from terminal to shell for the 3rd part, I looked 
+at pipes and how they are used:
+http://www.eg.bucknell.edu/~cs315/Spring10/labs/lab02/pipes.pdf
+Figure 5 is a great figure for what we are trying to do, just with child and parent
+processes instead of parent and client.
+
+To get more familiar with Termios I looked at:
+https://blog.nelhage.com/2009/12/a-brief-introduction-to-termios-termios3-and-stty/
+
+For processing the arguments, like in Lab 0, I loosely based it off of
+https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
+
+Makefile
+---
+This Makefile was much simpler than Lab 0's. 
+For default, clean, and dist, I just implemented the core functionality of each command. 
+I added .SILENT underneath default so that if there were errors or warnings during compilation,
+it would still show.  

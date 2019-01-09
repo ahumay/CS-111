@@ -1,0 +1,28 @@
+NAME: Anthony Humay
+EMAIL: ahumay@ucla.edu
+ID: 304731856
+SLIPDAYS: 1
+
+The files included are:
+lab1b-client.c
+---
+Mostly a combination of what we were instructed to do in 
+http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/client.c 
+and Lab 1A.
+
+lab1b-serve.c
+---
+Mostly a combination of what we were instructed to do in 
+http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/server.c
+and Lab 1A.
+
+Makefile
+---
+This Makefile was much simpler than Lab 0's. 
+For default, clean, and dist, I just implemented the core functionality of each command. 
+I added .SILENT underneath default so that if there were errors or warnings during compilation,
+it would still show.  
+
+my.key
+---
+My key for encryption, I just typed in random letters from my keyboard. 

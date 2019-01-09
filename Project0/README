@@ -1,0 +1,69 @@
+NAME: Anthony Humay
+EMAIL: ahumay@ucla.edu
+ID: 304731856
+
+The files included are:
+lab0.c
+---
+The source of the program that copies input to output. 
+It reads from FD0 and writes to FD1, which are standard input and standard output by default.
+
+For getopt_long() information, I looked at https://linux.die.net/man/3/getopt_long
+
+The general structure of my program is based off the example of Parsing Long Options with getopt_long shown in:
+https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
+
+To redirect input and output, I looked at the file descriptor manipulation attachment of the lab.
+
+
+backtrace.png
+---
+I entered GDB by executing the commands
+make dist
+gdb lab0
+
+Then ran 
+(gdb) run --segfault
+
+And got the output:
+Starting program: /w/home.07/cs/ugrad/humay/111/Project0/lab0 --segfault
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000000000400d30 in fault () at lab0.c:96
+96		*p = 'x';
+
+Then ran the backtrace
+(gdb) bt
+
+I put the code that caused the SEGFAULT in a separate subroutine as recommended. 
+
+
+breakpoint.png
+---
+I entered GDB, and ran
+(gdb) break fault
+To set the breakpoint at the place where the segmentation fault happens.
+I then ran the program until it stopped at that location
+(gdb) run --segfault
+And then stepped through the two lines to show a NULL pointer was being followed. 
+(gdb) si
+96		*p = 'x';
+(gdb) print p
+
+
+Makefile
+---
+I referenced this Bash document for a refresher on a few basic concepts:
+https://www.tldp.org/HOWTO/pdf/Bash-Prog-Intro-HOWTO.pdf
+Page 16 shows how to get the return value of a program, which we have to do many times.
+
+Page 9 shows the if else statement structure that I used. 
+
+Page 18 goes over arithmetic operators.
+
+The five tests I went through covered the 5 different type of exit statues. 
+0 - A normal actual use of the program with just --input and --output. 
+1 - Testing an unknown argument. 
+2 - Testing a non-existant input file. 
+3 - Testing an unopenable output file. 
+4 - Testing catching a segmentation fault. 

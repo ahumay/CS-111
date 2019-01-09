@@ -1,0 +1,29 @@
+NAME: Anthony Humay
+EMAIL: ahumay@ucla.edu
+ID: 304731856
+
+The files included are:
+lab4c_tls.c
+---
+This file communicates with the logging server.
+Opens a TCP connection to a specific server, gives
+it a unique ID to track the local device. The device then sends
+the temperature data over the connection. 
+The server can stop receiving this data with an OFF command.
+
+lab4c_tcp.c
+---
+This file opens a TLS session. 
+Sends student ID, temperature data over the connection, 
+now with the TLS encryption.
+
+
+Makefile
+---
+For default, clean, and dist, I just implemented the core functionality of each command. 
+I added .SILENT underneath default so that if there were errors or warnings during compilation,
+it would still show.  
+It includes: 
+default - build program.
+clean - remove old files.
+dist - for the tarball.

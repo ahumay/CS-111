@@ -1,0 +1,153 @@
+NAME: Anthony Humay
+EMAIL: ahumay@ucla.edu
+ID: 304731856
+
+PART 1 QUESTIONS
+---
+Anthonys-MacBook-Air:Project2A ahumay$ ./l2 --iterations=10000 --threads=10
+add-none,10,10000,200000,3412000,17,364
+Anthonys-MacBook-Air:Project2A ahumay$ ./l2 --iterations=10000 --threads=10
+add-none,10,10000,200000,3750000,18,514
+Anthonys-MacBook-Air:Project2A ahumay$ ./l2 --iterations=10000 --threads=10
+add-none,10,10000,200000,3855000,19,633
+Anthonys-MacBook-Air:Project2A ahumay$ ./l2 --iterations=10000 --threads=10
+add-none,10,10000,200000,3680000,18,677
+Anthonys-MacBook-Air:Project2A ahumay$ ./l2 --iterations=10000 --threads=10
+add-none,10,10000,200000,3882000,19,569
+Anthonys-MacBook-Air:Project2A ahumay$ ./l2 --iterations=10000 --threads=10
+add-none,10,10000,200000,3630000,18,578
+Anthonys-MacBook-Air:Project2A ahumay$ ./l2 --iterations=10000 --threads=10
+add-none,10,10000,200000,3381000,16,1303
+QUESTION 2.1.1 - causing conflicts:
+Why does it take many iterations before errors are seen?
+ANS: The more iterations there are, the more computatoom there is to do. When there is more computation for threads to do, 
+the likelihood of errors through race conditions or other factors increases. 
+Why does a significantly smaller number of iterations so seldom fail?
+ANS: As we have learned about in class, threads often have a set timeslice that they're given
+to complete the computation that they need to do. If there is a lot of computation, they 
+may have to give up control to another thread, which can cause problems if proper locks
+and signals are not used, especially around critical sections. 
+
+QUESTION 2.1.2 - cost of yielding:
+Why are the --yield runs so much slower?
+ANS: When a yield occurs, the currently running thread's timeslice is interrupted and 
+a context switch to another thread happens. 
+Where is the additional time going?
+ANS: This means that the current thread must save its registers and get replaced in the 
+schedule. There is overhead for the OS having to step in all do all of this as well. 
+Is it possible to get valid per-operation timings if we are using the --yield option?
+If so, explain how. If not, explain why not.
+ANS: The aforementioned context switches make it impossible to get the valid
+per-operation timings. The valid time would be the time the thread took to get to 
+the yield + the time it took after the yield, but since it gets interrupted 
+in between we don't have an accurate number. 
+
+QUESTION 2.1.3 - measurement errors:
+Why does the average cost per operation drop with increasing iterations?
+ANS: When the number of iterations increases and all other variables stay the same,
+then the amount of time executing actual instructions is increased and there is
+no context switching to eat into it. In economics this is the Law of Diminishing
+returns. pthread_create() can focus on doing it's job, which is to just do the 
+iterations. 
+If the cost per iteration is a function of the number of iterations, how do we know how many iterations to run (or what the "correct" cost is)?
+ANS: We can find out the "correct" cost by increasing the amount of iterations done. As alluded to before, 
+as we increase the number of iterations, the ratio of time spent on doing actual add work vs overhead/administrative
+work goes up. The cost vs number of iterations graph will look something like a S-curve, as the amount of 
+work done will eventually level off due to physical constraints. To find the absolute optimal point on that 
+graph would be to find the point where cost per iteration increases (the derivative) starts to level off.
+
+QUESTION 2.1.4 - costs of serialization:
+Why do all of the options perform similarly for low numbers of threads?
+ANS: If there are only a few threads, the administrative work like context switches are 
+much less of a factor since they are not being repeated. 
+If there are two racers, one that is 0.95% as fast as the other, over a 10 meter race 
+there will be a barely discernable difference between the two. But over a marathon, 
+the difference will be compounded and be extremely obvious. It is the same idea with
+threads; the options do not provide discernable performance differences at a low 
+number of threads. 
+Why do the three protected operations slow down as the number of threads rises?
+ANS: This is due to the administrative costs such as context switching, locking, and spinning, along
+with the actual operations themselves. 
+Locks are especially slowing down things, as now threads have to wait or block until the 
+they can obtain the lock. The bottleneck is centered around the lock. 
+
+PART 2 QUESTIONS
+---
+QUESTION 2.2.1 - scalability of Mutex
+Compare the variation in time per mutex-protected operation vs the number of threads in Part-1 (adds) and Part-2 (sorted lists).
+Comment on the general shapes of the curves, and explain why they have this shape.
+ANS: For mutex protected operations for Part-1, the time per operation goes up in a
+linear way with respect to time. For Part-2, similarly, we have a close to 
+linear relationship. 
+Comment on the relative rates of increase and differences in the shapes of the curves, and offer an explanation for these differences.
+ANS: The main difference is that the administrative costs for the list are higher.
+It takes more to set up those threads than it does for the add threads to be set up, 
+since they are simpler. However, they both are required to wait for their respective
+locks. 
+
+QUESTION 2.2.2 - scalability of spin locks
+Compare the variation in time per protected operation vs the number of threads for list operations protected by Mutex vs Spin locks.
+Comment on the general shapes of the curves, and explain why they have this shape.
+ANS: The cost per operation is going to generally be more for a spin lock, 
+since they will be using cycles to spin. 
+The mutex threads just pre-empt and normally will not experience as bad performance
+as the spin lock.
+Comment on the relative rates of increase and differences in the shapes of the curves, and offer an explanation for these differences.
+ANS: Although both somewhat linear, the slope of the spin locks will be much higher, since
+they take significantly more time spinning. 
+
+The files included are:
+lab2_add.c
+---
+Performing a basic add with multiple threads and various yield and 
+mutex options.
+Adds 1 and then -1, so the total count should be 0. 
+
+SortedList.h
+---
+Provided by Professor.
+
+SortedList.c
+---
+Implementing the SortedList.h.
+
+lab2_list.c
+---
+Performing basic operations with multiple threads to a linked list.
+Adds a specified amount of nodes, then deletes them, so the list
+should be the same size as it was before.  
+
+lab2_add.csv
+---
+Results for all of the Part-1 tests.
+
+lab2_list.csv
+---
+Results for all of the Part-2 tests.
+
+Pictures
+---
+lab2_add-1.png
+Threads and iterations required to generate a failure (with and without yields)
+lab2_add-2.png
+Average time per operation with and without yields.
+lab2_add-3.png
+Average time per (single threaded) operation vs. the number of iterations.
+lab2_add-4.png
+Threads and iterations that can run successfully with yields under each of the synchronization options.
+lab2_add-5.png
+Average time per (protected) operation vs. the number of threads.
+lab2_list-1.png 
+Average time per (single threaded) unprotected operation vs. number of iterations (illustrating the correction of the per-operation cost for the list length).
+lab2_list-2.png 
+Threads and iterations required to generate a failure (with and without yields).
+lab2_list-3.png
+Iterations that can run (protected) without failure.
+lab2_list-4.png 
+Cost per operation vs the number of threads for the various synchronization options.
+
+Makefile
+---
+For default, clean, and dist, I just implemented the core functionality of each command. 
+I added .SILENT underneath default so that if there were errors or warnings during compilation,
+it would still show.  

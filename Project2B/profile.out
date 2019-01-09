@@ -1,0 +1,235 @@
+Total: 1116 samples
+     972  87.1%  87.1%     1116 100.0% threadWork
+     108   9.7%  96.8%      108   9.7% __strcmp_sse42
+      18   1.6%  98.4%       65   5.8% SortedList_insert
+      16   1.4%  99.8%       78   7.0% SortedList_lookup
+       1   0.1%  99.9%        1   0.1% __GI___clock_gettime
+       1   0.1% 100.0%        1   0.1% _init
+       0   0.0% 100.0%     1116 100.0% __clone
+       0   0.0% 100.0%     1116 100.0% start_thread
+ROUTINE ====================== threadWork in /u/cs/ugrad/humay/111/2B/lab2_list.c
+   972   1116 Total samples (flat / cumulative)
+     .      .  251: 	for (i = 0; i < numThreads; i++) {
+     .      .  252: 		threadWaitTime[i] = 0;
+     .      .  253: 	}
+     .      .  254: }
+     .      .  255: 
+---
+     .      .  256: void * threadWork(void * num) {
+     .      .  257: 	int place = * (int *) num;
+     .      .  258: 	struct timespec threadStart;
+     .      .  259: 	struct timespec threadEnd;
+     .      .  260: 
+     .      .  261: ///////////////////////// insert
+     .      .  262: 	int i = place;
+     .      .  263: 	int listID = -1;
+     .      .  264: 	for (; i < ops; i += numThreads) {
+     .      .  265: 		listID = atoi(listItems[i].key) % numLists;
+     .      .  266: 		
+     .      .  267: 		if (syncFlag){
+     .      .  268: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+   580    580  269: 			while (__sync_lock_test_and_set(&syncLock[listID], 1)){}
+     .      .  270: 		} else if (mutexFlag){
+     .      .  271: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     .      .  272: 			pthread_mutex_lock(&mutexLock[listID]);
+     .      .  273: 		} 
+     .      .  274: 
+     .      .  275: 		if (mutexFlag || syncFlag) {
+     .      1  276: 			clock_gettime(CLOCK_REALTIME, &threadEnd);
+     .      .  277: 			long long int secondDiff = 1000000000 * (threadEnd.tv_sec - threadStart.tv_sec);
+     .      .  278: 			long long int nanoDiff = (threadEnd.tv_nsec - threadStart.tv_nsec);
+     .      .  279: 			long long timeDiff = secondDiff + nanoDiff;
+     .      .  280: 			threadWaitTime[place] += timeDiff;
+     .      .  281: 		}
+     .      .  282: 
+     .     65  283: 		SortedList_insert(list[listID], &listItems[i]);
+     .      .  284: 
+     .      .  285: 		if (syncFlag){
+     .      .  286: 			__sync_lock_release(&syncLock[listID]);
+     .      .  287: 		} else if (mutexFlag){
+     .      .  288: 			pthread_mutex_unlock(&mutexLock[listID]);
+     .      .  289: 		}
+     .      .  290: 	}
+     .      .  291: 
+     .      .  292: ///////////////////////// length
+     .      .  293: 	int totalLength = 0;
+     .      .  294: 	i = 0;
+     .      .  295: 	for (; i < numLists; i++) {
+     .      .  296: 		if (syncFlag){
+     .      .  297: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     1      1  298: 			while (__sync_lock_test_and_set(&syncLock[i], 1)){}
+     .      .  299: 		} else if (mutexFlag){
+     .      .  300: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     .      .  301: 			pthread_mutex_lock(&mutexLock[i]);
+     .      .  302: 		} 
+     .      .  303: 
+     .      .  304: 		if (mutexFlag || syncFlag) {
+     .      .  305: 			clock_gettime(CLOCK_REALTIME, &threadEnd);
+     .      .  306: 			long long int secondDiff = 1000000000 * (threadEnd.tv_sec - threadStart.tv_sec);
+     .      .  307: 			long long int nanoDiff = (threadEnd.tv_nsec - threadStart.tv_nsec);
+     .      .  308: 			long long timeDiff = secondDiff + nanoDiff;
+     .      .  309: 			threadWaitTime[place] += timeDiff;
+     .      .  310: 		}
+     .      .  311: 
+     .      .  312: 		int len = SortedList_length(list[i]);
+     .      .  313: 		ehandler('n', len);
+     .      .  314: 		totalLength += len;
+     .      .  315: 
+     .      .  316: 		if (syncFlag){
+     .      .  317: 			__sync_lock_release(&syncLock[i]);
+     .      .  318: 		} else if (mutexFlag){
+     .      .  319: 			pthread_mutex_unlock(&mutexLock[i]);
+     .      .  320: 		}
+     .      .  321: 	}
+     .      .  322: 
+     .      .  323: ///////////////////////// delete
+     .      .  324: 	i = 0;
+     .      .  325: 	for (i = place; i < ops; i += numThreads) {
+     .      .  326: 		listID = atoi(listItems[i].key) % numLists;
+     .      .  327: 		if (syncFlag){
+     .      .  328: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+   391    391  329: 			while (__sync_lock_test_and_set(&syncLock[listID], 1)){}
+     .      .  330: 		} else if (mutexFlag){
+     .      .  331: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     .      .  332: 			pthread_mutex_lock(&mutexLock[listID]);
+     .      .  333: 		} 
+     .      .  334: 
+     .      .  335: 		if (mutexFlag || syncFlag) {
+     .      .  336: 			clock_gettime(CLOCK_REALTIME, &threadEnd);
+     .      .  337: 			long long int secondDiff = 1000000000 * (threadEnd.tv_sec - threadStart.tv_sec);
+     .      .  338: 			long long int nanoDiff = (threadEnd.tv_nsec - threadStart.tv_nsec);
+     .      .  339: 			long long timeDiff = secondDiff + nanoDiff;
+     .      .  340: 			threadWaitTime[place] += timeDiff;
+     .      .  341: 		}
+     .      .  342: 
+     .     78  343: 		SortedListElement_t * cur = SortedList_lookup(list[listID], listItems[i].key);
+     .      .  344: 		if (cur == NULL) { notFound(); }
+     .      .  345: 		if (SortedList_delete(cur) == 1) { nullEntry(); }
+     .      .  346: 
+     .      .  347: 		if (syncFlag){
+     .      .  348: 			__sync_lock_release(&syncLock[listID]);
+     .      .  349: 		} else if (mutexFlag){
+     .      .  350: 			pthread_mutex_unlock(&mutexLock[listID]);
+     .      .  351: 		}
+     .      .  352: 	}
+     .      .  353: 
+     .      .  354: 	pthread_exit(0);
+---
+     .      .  355: }
+     .      .  356: 
+     .      .  357: void sigHandler(int errorCode){
+     .      .  358: 	if (errorCode == SIGSEGV) {
+     .      .  359: 		fprintf(stderr, "\nSegmentation fault.\n");
+ROUTINE ====================== threadWork in /u/cs/ugrad/humay/111/2B/lab2_list.c
+   972   1116 Total samples (flat / cumulative)
+     .      .  251: 	for (i = 0; i < numThreads; i++) {
+     .      .  252: 		threadWaitTime[i] = 0;
+     .      .  253: 	}
+     .      .  254: }
+     .      .  255: 
+---
+     .      .  256: void * threadWork(void * num) {
+     .      .  257: 	int place = * (int *) num;
+     .      .  258: 	struct timespec threadStart;
+     .      .  259: 	struct timespec threadEnd;
+     .      .  260: 
+     .      .  261: ///////////////////////// insert
+     .      .  262: 	int i = place;
+     .      .  263: 	int listID = -1;
+     .      .  264: 	for (; i < ops; i += numThreads) {
+     .      .  265: 		listID = atoi(listItems[i].key) % numLists;
+     .      .  266: 		
+     .      .  267: 		if (syncFlag){
+     .      .  268: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+   580    580  269: 			while (__sync_lock_test_and_set(&syncLock[listID], 1)){}
+     .      .  270: 		} else if (mutexFlag){
+     .      .  271: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     .      .  272: 			pthread_mutex_lock(&mutexLock[listID]);
+     .      .  273: 		} 
+     .      .  274: 
+     .      .  275: 		if (mutexFlag || syncFlag) {
+     .      1  276: 			clock_gettime(CLOCK_REALTIME, &threadEnd);
+     .      .  277: 			long long int secondDiff = 1000000000 * (threadEnd.tv_sec - threadStart.tv_sec);
+     .      .  278: 			long long int nanoDiff = (threadEnd.tv_nsec - threadStart.tv_nsec);
+     .      .  279: 			long long timeDiff = secondDiff + nanoDiff;
+     .      .  280: 			threadWaitTime[place] += timeDiff;
+     .      .  281: 		}
+     .      .  282: 
+     .     65  283: 		SortedList_insert(list[listID], &listItems[i]);
+     .      .  284: 
+     .      .  285: 		if (syncFlag){
+     .      .  286: 			__sync_lock_release(&syncLock[listID]);
+     .      .  287: 		} else if (mutexFlag){
+     .      .  288: 			pthread_mutex_unlock(&mutexLock[listID]);
+     .      .  289: 		}
+     .      .  290: 	}
+     .      .  291: 
+     .      .  292: ///////////////////////// length
+     .      .  293: 	int totalLength = 0;
+     .      .  294: 	i = 0;
+     .      .  295: 	for (; i < numLists; i++) {
+     .      .  296: 		if (syncFlag){
+     .      .  297: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     1      1  298: 			while (__sync_lock_test_and_set(&syncLock[i], 1)){}
+     .      .  299: 		} else if (mutexFlag){
+     .      .  300: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     .      .  301: 			pthread_mutex_lock(&mutexLock[i]);
+     .      .  302: 		} 
+     .      .  303: 
+     .      .  304: 		if (mutexFlag || syncFlag) {
+     .      .  305: 			clock_gettime(CLOCK_REALTIME, &threadEnd);
+     .      .  306: 			long long int secondDiff = 1000000000 * (threadEnd.tv_sec - threadStart.tv_sec);
+     .      .  307: 			long long int nanoDiff = (threadEnd.tv_nsec - threadStart.tv_nsec);
+     .      .  308: 			long long timeDiff = secondDiff + nanoDiff;
+     .      .  309: 			threadWaitTime[place] += timeDiff;
+     .      .  310: 		}
+     .      .  311: 
+     .      .  312: 		int len = SortedList_length(list[i]);
+     .      .  313: 		ehandler('n', len);
+     .      .  314: 		totalLength += len;
+     .      .  315: 
+     .      .  316: 		if (syncFlag){
+     .      .  317: 			__sync_lock_release(&syncLock[i]);
+     .      .  318: 		} else if (mutexFlag){
+     .      .  319: 			pthread_mutex_unlock(&mutexLock[i]);
+     .      .  320: 		}
+     .      .  321: 	}
+     .      .  322: 
+     .      .  323: ///////////////////////// delete
+     .      .  324: 	i = 0;
+     .      .  325: 	for (i = place; i < ops; i += numThreads) {
+     .      .  326: 		listID = atoi(listItems[i].key) % numLists;
+     .      .  327: 		if (syncFlag){
+     .      .  328: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+   391    391  329: 			while (__sync_lock_test_and_set(&syncLock[listID], 1)){}
+     .      .  330: 		} else if (mutexFlag){
+     .      .  331: 			clock_gettime(CLOCK_REALTIME, &threadStart);
+     .      .  332: 			pthread_mutex_lock(&mutexLock[listID]);
+     .      .  333: 		} 
+     .      .  334: 
+     .      .  335: 		if (mutexFlag || syncFlag) {
+     .      .  336: 			clock_gettime(CLOCK_REALTIME, &threadEnd);
+     .      .  337: 			long long int secondDiff = 1000000000 * (threadEnd.tv_sec - threadStart.tv_sec);
+     .      .  338: 			long long int nanoDiff = (threadEnd.tv_nsec - threadStart.tv_nsec);
+     .      .  339: 			long long timeDiff = secondDiff + nanoDiff;
+     .      .  340: 			threadWaitTime[place] += timeDiff;
+     .      .  341: 		}
+     .      .  342: 
+     .     78  343: 		SortedListElement_t * cur = SortedList_lookup(list[listID], listItems[i].key);
+     .      .  344: 		if (cur == NULL) { notFound(); }
+     .      .  345: 		if (SortedList_delete(cur) == 1) { nullEntry(); }
+     .      .  346: 
+     .      .  347: 		if (syncFlag){
+     .      .  348: 			__sync_lock_release(&syncLock[listID]);
+     .      .  349: 		} else if (mutexFlag){
+     .      .  350: 			pthread_mutex_unlock(&mutexLock[listID]);
+     .      .  351: 		}
+     .      .  352: 	}
+     .      .  353: 
+     .      .  354: 	pthread_exit(0);
+---
+     .      .  355: }
+     .      .  356: 
+     .      .  357: void sigHandler(int errorCode){
+     .      .  358: 	if (errorCode == SIGSEGV) {
+     .      .  359: 		fprintf(stderr, "\nSegmentation fault.\n");

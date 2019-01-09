@@ -1,0 +1,11 @@
+# NAME: Clayton Green, Anthony Humay
+# EMAIL: clayton.green26@gmail.com, ahumay@ucla.edu
+# ID: 404546151, 304731856
+
+Files:
+	README: contains description of all files included in tarball
+	Makefile: standard makefile with build, clean, and dist targets
+	lab3b.py: python file for analyzing file system reports
+	lab3b.sh: shell script for running lab3b.py by linking lab3b.sh
+		      to "lab3b" so that program can run as if it was a compiled
+		      c executable

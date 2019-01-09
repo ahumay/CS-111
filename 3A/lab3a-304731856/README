@@ -1,0 +1,9 @@
+// NAME: Anthony Humay, Clayton Green
+// EMAIL: ahumay@ucla.edu, clayton.green26@gmail.com
+// ID: 304731856, 404546151
+
+Files:
+	lab3a.c: source file that will create executable
+	Makefile: standard makefile with build, dist, and clean targets
+	README: summary of files and miscellaneous info
+	ext2_fs.h: header file for EXT2 file system definitions

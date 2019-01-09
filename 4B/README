@@ -1,0 +1,32 @@
+NAME: Anthony Humay
+EMAIL: ahumay@ucla.edu
+ID: 304731856
+
+The files included are:
+lab4b.c
+---
+Implemented the temperature taking functionality of the lab, 
+and prints out / logs all the temperatures into a file. 
+One can adjust the time between taking temperatures, as well 
+as whether it is returned in Fahrenheit or Celsius. 
+A user can also type one of the following commands:
+SCALE=F
+SCALE=C
+PERIOD=seconds
+STOP
+START
+LOG line of text
+OFF
+All of these pieces of information are put into the lab report. 
+
+
+Makefile
+---
+For default, clean, and dist, I just implemented the core functionality of each command. 
+I added .SILENT underneath default so that if there were errors or warnings during compilation,
+it would still show.  
+It includes: 
+default - build program.
+check - run smoketest.
+clean - remove old files.
+dist - for the tarball.
