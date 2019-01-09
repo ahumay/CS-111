@@ -1,7 +1,6 @@
 // NAME: Anthony Humay
 // EMAIL: ahumay@ucla.edu
-// ID: 304731856
-// SLIPDAYS: 1
+
 #include <stdio.h> 
 #include <getopt.h>
 #include <stdlib.h>
